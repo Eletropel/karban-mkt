@@ -2,6 +2,8 @@
 
 Painel web interno para organizar os trabalhos do setor de Marketing da **Eletropel Distribuidora de Auto Peças**.
 
+> Versão atual: Kanban com arrastar e soltar reforçado e persistência local por navegador.
+
 ## O que o sistema faz
 
 - Organiza os trabalhos em formato Kanban.
@@ -59,7 +61,7 @@ Depois de alguns instantes, o GitHub vai disponibilizar o endereço do site.
 
 ## Dados e armazenamento
 
-A versão atual utiliza **localStorage** do navegador.
+A versão atual utiliza **localStorage** do navegador. O status da coluna é salvo imediatamente ao soltar um card, portanto atualizar a página não deve devolver o trabalho ao Backlog.
 
 Isso significa que os trabalhos ficam armazenados no navegador/dispositivo em que o sistema está sendo utilizado.
 

@@ -48,7 +48,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;align-items:center;justify-content:center;padding:16px}.modal-bg.open{display:flex}
 .modal{width:min(650px,100%);background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.3)}.modal-head{background:var(--yellow);border-bottom:4px solid var(--red);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;font-size:16px}.modal-body{padding:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}.label{font-size:10px;font-weight:900;text-transform:uppercase;color:#6d7277;display:block;margin-bottom:5px}.modal-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
 .toast{display:none;position:fixed;right:20px;bottom:20px;background:#1d1f22;color:#fff;padding:10px 13px;border-radius:8px;font-size:11px;z-index:80}.toast.show{display:block}
-.footer{text-align:center;color:#8b8e92;font-size:10px;padding:20px 0 0}
+.card{cursor:pointer}.card.expanded{box-shadow:0 10px 28px rgba(0,0,0,.13);border-color:#c8cbd0}.card-summary{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:7px}.card-summary .summary-date{font-size:10px;color:#5e646a}.card-details{display:none;margin-top:11px;padding-top:10px;border-top:1px solid #e6e7e9}.card.expanded .card-details{display:block}.detail-row{display:grid;grid-template-columns:88px 1fr;gap:8px;font-size:10px;margin:6px 0}.detail-label{font-weight:900;color:#73787e;text-transform:uppercase}.detail-value{color:#2f3337;white-space:pre-wrap;word-break:break-word}.card-click-hint{font-size:9px;color:#a0a4a8}.report-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:60;align-items:center;justify-content:center;padding:16px}.report-bg.open{display:flex}.report{width:min(900px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.35)}.report-head{background:var(--yellow);border-bottom:4px solid var(--red);padding:15px 18px;display:flex;justify-content:space-between;align-items:center}.report-head h2{margin:0;font-size:17px}.report-body{padding:18px}.report-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.report-filters select{border:1px solid #d2d5d8;border-radius:7px;padding:8px;background:#fafafa}.report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:16px}.report-stat{border:1px solid var(--line);border-radius:8px;padding:11px;background:#fafafa}.report-stat span{display:block;font-size:9px;text-transform:uppercase;color:#777;font-weight:900}.report-stat strong{font-size:22px;display:block;margin-top:3px}.report-list{border:1px solid var(--line);border-radius:8px;overflow:hidden}.report-item{padding:10px 12px;border-bottom:1px solid #eee;display:grid;grid-template-columns:1fr 120px 110px;gap:10px;align-items:center;font-size:11px}.report-item:last-child{border-bottom:0}.report-item strong{font-size:12px}.report-muted{color:#777;font-size:10px}.report-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}@media(max-width:650px){.report-grid{grid-template-columns:repeat(2,1fr)}.report-item{grid-template-columns:1fr}.detail-row{grid-template-columns:75px 1fr}}.footer{text-align:center;color:#8b8e92;font-size:10px;padding:20px 0 0}
 @media(max-width:1100px){.stats{grid-template-columns:repeat(3,1fr)}.kanban{grid-template-columns:repeat(5,260px)}}
 @media(max-width:650px){.header{padding:10px 14px}.logo{width:145px}.divider{display:none}.brand-title{display:none}.wrap{padding:14px}.stats{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.hero{display:block}}
 </style>
@@ -62,7 +62,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
    <div><div class="brand-title">Controle de Marketing</div><div class="brand-sub">Organização • Prioridades • Produção</div></div>
   </div>
   <div class="actions">
-   <button class="btn" onclick="exportData()">↧ Backup</button>
+   <button class="btn" onclick="openReports()">📊 Relatórios</button><button class="btn" onclick="exportData()">↧ Backup</button>
    <button class="btn" onclick="document.getElementById('importFile').click()">↥ Restaurar</button>
    <input id="importFile" type="file" accept=".json" hidden onchange="importData(event)">
    <button class="btn primary" onclick="openModal()">＋ Novo trabalho</button>
@@ -79,7 +79,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
   <button class="btn" onclick="clearFilters()">Limpar filtros</button>
  </section>
  <section class="kanban" id="kanban"></section>
- <div class="footer">Eletropel • Marketing · v4.0 · Os dados são salvos localmente neste navegador.</div>
+ <div class="footer">Eletropel • Marketing · v5.0 · Os dados são salvos localmente neste navegador.</div>
 </main>
 <div class="modal-bg" id="modalBg">
  <div class="modal">
@@ -98,9 +98,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
   </form>
  </div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="report-bg" id="reportBg"><div class="report"><div class="report-head"><div><h2>📊 Relatórios de Marketing</h2><div class="brand-sub">Visão dos trabalhos por período e status</div></div><button class="iconbtn" onclick="closeReports()">✕</button></div><div class="report-body"><div class="report-filters"><select id="reportPeriod" onchange="renderReport()"><option value="today">Hoje</option><option value="week">Esta semana</option><option value="month" selected>Este mês</option><option value="all">Todos</option></select><select id="reportBasis" onchange="renderReport()"><option value="created">Trabalhos criados no período</option><option value="due">Trabalhos com prazo no período</option><option value="completed">Trabalhos concluídos no período</option></select></div><div id="reportContent"></div></div><div class="report-foot"><button class="btn" onclick="closeReports()">Fechar</button></div></div></div><div class="toast" id="toast"></div>
 <script>
-const KEY='eletropel_marketing_kanban_v4';
+const KEY='eletropel_marketing_kanban_v5';
 const columns=[{id:'backlog',title:'📥 BACKLOG'},{id:'todo',title:'📌 A FAZER'},{id:'doing',title:'🔵 EM ANDAMENTO'},{id:'waiting',title:'⏳ AGUARDANDO'},{id:'done',title:'✅ CONCLUÍDO'}];
 let works=JSON.parse(localStorage.getItem(KEY)||'null')||[];
 let editingId=null;
@@ -182,37 +182,42 @@ function moveWork(id,status){
 }
 
 function card(w){
- return `<article class="card pr-${w.priority}" draggable="true" data-id="${w.id}">
+ return `<article class="card pr-${w.priority}" draggable="true" data-id="${w.id}" onclick="toggleCard(event,'${w.id}')">
   <div class="card-top"><h3>${esc(w.title)}</h3><span class="badge p-${w.priority}">${pl(w.priority)}</span></div>
-  ${w.client?`<div class="meta">🏢 ${esc(w.client)}</div>`:''}
-  <div class="meta">🏷️ ${esc(w.category||'Outro')}</div>
-  <div class="meta ${dc(w.due,w.status)}">📅 ${fmtDate(w.due)}</div>
-  ${w.owner?`<div class="meta">👤 ${esc(w.owner)}</div>`:''}
-  ${w.notes?`<div class="meta">📝 ${esc(w.notes).slice(0,90)}${w.notes.length>90?'…':''}</div>`:''}
-  <div class="card-footer">
-   <small class="${dc(w.due,w.status)}">${w.due&&w.status!=='done'&&w.due<today()?'ATRASADO':w.due===today()&&w.status!=='done'?'VENCE HOJE':''}</small>
-   <div>
-    <select class="move-select" title="Mover trabalho" onchange="moveWork('${w.id}',this.value)">
-     <option value="">Mover para...</option>
-     ${columns.filter(c=>c.id!==w.status).map(c=>`<option value="${c.id}">${c.title}</option>`).join('')}
-    </select>
-    <button class="iconbtn" onclick="editWork('${w.id}')" title="Editar">✎</button>
-    <button class="iconbtn" onclick="deleteWork('${w.id}')" title="Excluir">🗑</button>
-   </div>
+  <div class="card-summary"><span class="summary-date">📅 ${fmtDate(w.due)}</span><span class="badge">${columns.find(c=>c.id===w.status)?.title || 'STATUS'}</span></div>
+  <div class="card-details">
+   <div class="detail-row"><div class="detail-label">Setor</div><div class="detail-value">${esc(w.client||'Não informado')}</div></div>
+   <div class="detail-row"><div class="detail-label">Categoria</div><div class="detail-value">${esc(w.category||'Não informado')}</div></div>
+   <div class="detail-row"><div class="detail-label">Responsável</div><div class="detail-value">${esc(w.owner||'Não informado')}</div></div>
+   <div class="detail-row"><div class="detail-label">Prazo</div><div class="detail-value ${dc(w.due,w.status)}">${fmtDate(w.due)} ${w.due&&w.status!=='done'&&w.due<today()?'— ATRASADO':w.due===today()&&w.status!=='done'?'— VENCE HOJE':''}</div></div>
+   <div class="detail-row"><div class="detail-label">Criado</div><div class="detail-value">${fmtDate(w.created)}</div></div>
+   <div class="detail-row"><div class="detail-label">Observações</div><div class="detail-value">${esc(w.notes||'Nenhuma observação.')}</div></div>
+   <div class="detail-row"><div class="detail-label">Ações</div><div class="detail-value">
+    <select class="move-select" onclick="event.stopPropagation()" onchange="moveWork('${w.id}',this.value)"><option value="">Mover para...</option>${columns.filter(c=>c.id!==w.status).map(c=>`<option value="${c.id}">${c.title}</option>`).join('')}</select>
+    <button class="iconbtn" onclick="event.stopPropagation();editWork('${w.id}')">✎</button>
+    <button class="iconbtn" onclick="event.stopPropagation();deleteWork('${w.id}')">🗑</button>
+   </div></div>
+   <div class="card-click-hint">Clique novamente para recolher.</div>
   </div>
+  <div class="card-footer"><small class="${dc(w.due,w.status)}">${w.due&&w.status!=='done'&&w.due<today()?'ATRASADO':w.due===today()&&w.status!=='done'?'VENCE HOJE':''}</small><span class="card-click-hint">Clique para detalhes</span></div>
  </article>`;
 }
-
+function toggleCard(event,id){
+ if(event.target.closest('button,select,input,textarea,a')) return;
+ const el=event.currentTarget;
+ document.querySelectorAll('.card.expanded').forEach(c=>{if(c!==el)c.classList.remove('expanded')});
+ el.classList.toggle('expanded');
+}
 function openModal(id=null){editingId=id;$('modalTitle').textContent=id?'Editar trabalho':'Novo trabalho';if(id){let w=works.find(x=>x.id===id);fTitle.value=w.title;fClient.value=w.client;fCategory.value=w.category;fPriority.value=w.priority;fDue.value=w.due;fOwner.value=w.owner;fNotes.value=w.notes}else{$('workForm').reset();fPriority.value='normal'}$('modalBg').classList.add('open');setTimeout(()=>fTitle.focus(),40)}
 function closeModal(){$('modalBg').classList.remove('open');editingId=null}
 function saveWork(e){e.preventDefault();let d={title:fTitle.value.trim(),client:fClient.value.trim(),category:fCategory.value,priority:fPriority.value,due:fDue.value,owner:fOwner.value.trim(),notes:fNotes.value.trim()};if(editingId)Object.assign(works.find(w=>w.id===editingId),d);else works.push({id:uid(),...d,status:'backlog',created:today()});save();closeModal();render();toast('Trabalho salvo.')}
 function editWork(id){openModal(id)}
 function deleteWork(id){let w=works.find(x=>x.id===id);if(confirm(`Excluir "${w.title}"?`)){works=works.filter(x=>x.id!==id);save();render();toast('Trabalho excluído.')}}
-function clearFilters(){$('search').value='';$('priorityFilter').value='';$('categoryFilter').value='';render()}
+function openReports(){ $('reportBg').classList.add('open'); renderReport(); } function closeReports(){ $('reportBg').classList.remove('open'); } function dateObj(s){return s?new Date(s+'T00:00:00'):null} function startOfWeek(d){let x=new Date(d),day=x.getDay(),diff=day===0?-6:1-day;x.setDate(x.getDate()+diff);x.setHours(0,0,0,0);return x} function inReportPeriod(s,p){if(!s)return false;if(p==='all')return true;let d=dateObj(s),n=dateObj(today());if(p==='today')return s===today();if(p==='month')return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();if(p==='week'){let a=startOfWeek(n),b=new Date(a);b.setDate(b.getDate()+6);b.setHours(23,59,59,999);return d>=a&&d<=b}return false} function renderReport(){let period=$('reportPeriod').value,basis=$('reportBasis').value,list=works.filter(w=>inReportPeriod(basis==='created'?w.created:basis==='due'?w.due:(w.completed||''),period)),done=list.filter(w=>w.status==='done').length,doing=list.filter(w=>w.status==='doing').length,urgent=list.filter(w=>w.priority==='urgente').length;$('reportContent').innerHTML=`<div class="report-grid"><div class="report-stat"><span>Total</span><strong>${list.length}</strong></div><div class="report-stat"><span>Concluídos</span><strong>${done}</strong></div><div class="report-stat"><span>Em andamento</span><strong>${doing}</strong></div><div class="report-stat"><span>Urgentes</span><strong>${urgent}</strong></div></div><div class="report-list">${list.length?list.slice().sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).map(w=>`<div class="report-item"><div><strong>${esc(w.title)}</strong><div class="report-muted">${esc(w.client||'Sem setor')} · ${esc(w.category||'Sem categoria')}</div></div><div>📅 ${fmtDate(w.due)}</div><div>${columns.find(c=>c.id===w.status)?.title||''}</div></div>`).join(''):`<div class="empty" style="margin:10px">Nenhum trabalho encontrado neste período.</div>`}</div>`} function clearFilters(){$('search').value='';$('priorityFilter').value='';$('categoryFilter').value='';render()}
 function toast(msg){let t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
 function exportData(){let b=new Blob([JSON.stringify(works,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='eletropel-marketing-backup.json';a.click();URL.revokeObjectURL(a.href);toast('Backup exportado.')}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw 0;works=d;save();render();toast('Backup restaurado.')}catch{alert('Arquivo JSON inválido.')}};r.readAsText(f);e.target.value=''}
-$('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal()});
+$('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal()});$('reportBg').addEventListener('click',e=>{if(e.target.id==='reportBg')closeReports()});
 render();
 </script>
 </body>

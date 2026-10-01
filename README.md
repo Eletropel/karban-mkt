@@ -2,7 +2,7 @@
 
 Painel web interno para organizar os trabalhos do setor de Marketing da **Eletropel Distribuidora de Auto Peças**.
 
-> Versão atual: **v4.0** — Kanban com arrastar e soltar reforçado, opção alternativa de mover pelo card e versão identificada no rodapé.
+> Versão atual: **v5.0** — Kanban com arrastar e soltar reforçado, opção alternativa de mover pelo card e versão identificada no rodapé.
 
 ## O que o sistema faz
 
@@ -126,3 +126,12 @@ O projeto pode posteriormente receber:
 
 **Eletropel Distribuidora de Auto Peças**  
 Sistema interno — Marketing
+
+
+## Relatórios — v5.0
+
+Consulte trabalhos de hoje, esta semana, este mês ou todos, filtrando por criados, com prazo ou concluídos.
+
+## Cards compactos
+
+Clique em um card para abrir os detalhes no próprio card. O resumo mostra título, prazo, prioridade e status; os detalhes mostram setor, categoria, responsável, observações e ações.

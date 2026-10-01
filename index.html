@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fff000">
+<title>Eletropel • Marketing | Kanban</title>
+<style>
+:root{
+  --yellow:#fff000;--yellow2:#ffe600;--red:#ef1017;--red2:#c90008;
+  --ink:#171717;--muted:#6f7378;--bg:#f4f5f6;--white:#fff;
+  --line:#dedfe2;--card:#fff;--green:#159447;--blue:#2878d7;
+  --shadow:0 8px 24px rgba(22,22,22,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.top{background:var(--yellow);border-bottom:5px solid var(--red);position:sticky;top:0;z-index:20}
+.header{max-width:1650px;margin:auto;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:16px}.logo{width:185px;height:58px;object-fit:contain;object-position:left center}
+.divider{height:40px;width:2px;background:rgba(0,0,0,.2)}
+.brand-title{font-weight:900;text-transform:uppercase;letter-spacing:.04em;font-size:16px}.brand-sub{font-size:11px;color:#333;margin-top:2px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid #cfd1d4;background:#fff;color:#222;border-radius:8px;padding:9px 13px;font-weight:800;box-shadow:0 2px 5px rgba(0,0,0,.05)}
+.btn:hover{background:#f7f7f7}.btn.primary{background:var(--red);border-color:var(--red);color:#fff}.btn.primary:hover{background:var(--red2)}
+.wrap{max-width:1650px;margin:auto;padding:20px 24px 38px}
+.hero{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:16px}
+.hero h1{margin:0;font-size:25px}.hero p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:15px}
+.stat{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);border-top:3px solid #bbb}
+.stat.red{border-top-color:var(--red)}.stat.yellow{border-top-color:var(--yellow2)}.stat.blue{border-top-color:var(--blue)}.stat.green{border-top-color:var(--green)}
+.stat span{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}.stat strong{display:block;font-size:24px;margin-top:4px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:15px;box-shadow:var(--shadow)}
+.search{flex:1;min-width:230px}.field,.search input,.toolbar select{width:100%;border:1px solid #d2d5d8;background:#fafafa;border-radius:7px;padding:9px 10px;outline:0}.field:focus,.search input:focus,.toolbar select:focus{border-color:var(--red)}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(235px,1fr));gap:12px;overflow-x:auto}
+.column{background:#e8e9eb;border:1px solid #d4d6d9;border-radius:11px;min-height:410px}
+.col-head{background:#fff;border-radius:11px 11px 0 0;border-bottom:1px solid #d7d9dc;padding:12px 13px;display:flex;justify-content:space-between;align-items:center}
+.col-title{font-size:11px;font-weight:950;letter-spacing:.06em}.count{background:#eee;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:900}
+.cards{padding:9px;min-height:350px;transition:.12s}.drop-active{background:#fff3a8;box-shadow:inset 0 0 0 2px #f0d800}
+.card{background:var(--card);border:1px solid #d9dce0;border-left:4px solid #aaa;border-radius:8px;padding:12px;margin-bottom:8px;box-shadow:0 4px 12px rgba(0,0,0,.06);transition:.15s}
+.card:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(0,0,0,.1)}.card.dragging{opacity:.45}
+.card.pr-urgente{border-left-color:var(--red)}.card.pr-alta{border-left-color:#ed7c16}.card.pr-normal{border-left-color:#d8b500}.card.pr-baixa{border-left-color:var(--blue)}
+.card-top{display:flex;justify-content:space-between;gap:7px;align-items:flex-start}.card h3{font-size:13px;margin:0 0 7px;line-height:1.25}
+.badge{font-size:9px;font-weight:950;border-radius:20px;padding:4px 7px;white-space:nowrap}.p-urgente{background:#ffe0e2;color:#c40008}.p-alta{background:#ffead8;color:#a94e00}.p-normal{background:#fff5bc;color:#735e00}.p-baixa{background:#dfeeff;color:#1f5caa}
+.meta{font-size:10px;color:#6b7076;margin:4px 0}.overdue{color:#c90008;font-weight:900}.today{color:#a47700;font-weight:900}
+.card-footer{border-top:1px solid #ececee;margin-top:9px;padding-top:7px;display:flex;justify-content:space-between;align-items:center;gap:5px}.move-select{max-width:105px;border:1px solid #d4d6d9;background:#fafafa;border-radius:5px;padding:3px 4px;font-size:9px;color:#555}.iconbtn{border:0;background:transparent;padding:3px;color:#7a8087}.iconbtn:hover{color:#111}
+.empty{text-align:center;color:#9a9da1;font-size:11px;padding:32px 8px;border:1px dashed #c6c9cc;border-radius:7px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;align-items:center;justify-content:center;padding:16px}.modal-bg.open{display:flex}
+.modal{width:min(650px,100%);background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.3)}.modal-head{background:var(--yellow);border-bottom:4px solid var(--red);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;font-size:16px}.modal-body{padding:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}.label{font-size:10px;font-weight:900;text-transform:uppercase;color:#6d7277;display:block;margin-bottom:5px}.modal-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.toast{display:none;position:fixed;right:20px;bottom:20px;background:#1d1f22;color:#fff;padding:10px 13px;border-radius:8px;font-size:11px;z-index:80}.toast.show{display:block}
+.footer{text-align:center;color:#8b8e92;font-size:10px;padding:20px 0 0}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(3,1fr)}.kanban{grid-template-columns:repeat(5,260px)}}
+@media(max-width:650px){.header{padding:10px 14px}.logo{width:145px}.divider{display:none}.brand-title{display:none}.wrap{padding:14px}.stats{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.hero{display:block}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="header">
+  <div class="brand">
+   <img class="logo" src="logo-eletropel.png" alt="Eletropel Distribuidora de Auto Peças">
+   <div class="divider"></div>
+   <div><div class="brand-title">Controle de Marketing</div><div class="brand-sub">Organização • Prioridades • Produção</div></div>
+  </div>
+  <div class="actions">
+   <button class="btn" onclick="exportData()">↧ Backup</button>
+   <button class="btn" onclick="document.getElementById('importFile').click()">↥ Restaurar</button>
+   <input id="importFile" type="file" accept=".json" hidden onchange="importData(event)">
+   <button class="btn primary" onclick="openModal()">＋ Novo trabalho</button>
+  </div>
+ </div>
+</header>
+<main class="wrap">
+ <div class="hero"><div><h1>Painel de Produção</h1><p>Centralize os trabalhos do marketing e acompanhe cada etapa sem perder prazo.</p></div></div>
+ <section class="stats" id="stats"></section>
+ <section class="toolbar">
+  <div class="search"><input id="search" placeholder="🔎 Buscar trabalho, setor, categoria..." oninput="render()"></div>
+  <div style="min-width:155px"><select id="priorityFilter" onchange="render()"><option value="">Todas prioridades</option><option value="urgente">🔴 Urgente</option><option value="alta">🟠 Alta</option><option value="normal">🟡 Normal</option><option value="baixa">🔵 Baixa</option></select></div>
+  <div style="min-width:155px"><select id="categoryFilter" onchange="render()"><option value="">Todas categorias</option></select></div>
+  <button class="btn" onclick="clearFilters()">Limpar filtros</button>
+ </section>
+ <section class="kanban" id="kanban"></section>
+ <div class="footer">Eletropel • Marketing · v4.0 · Os dados são salvos localmente neste navegador.</div>
+</main>
+<div class="modal-bg" id="modalBg">
+ <div class="modal">
+  <div class="modal-head"><h2 id="modalTitle">Novo trabalho</h2><button class="iconbtn" onclick="closeModal()">✕</button></div>
+  <form id="workForm" onsubmit="saveWork(event)">
+   <div class="modal-body"><div class="form-grid">
+    <div class="full"><label class="label">Trabalho *</label><input class="field" id="fTitle" required placeholder="Ex.: Folder promoção de outubro"></div>
+    <div><label class="label">Setor / Cliente</label><input class="field" id="fClient" placeholder="Ex.: Comercial / FLX"></div>
+    <div><label class="label">Categoria</label><select class="field" id="fCategory"><option>Arte</option><option>Folder</option><option>Embalagem</option><option>Catálogo</option><option>Social Media</option><option>Impressão</option><option>Foto</option><option>Vídeo</option><option>Apresentação</option><option>Outro</option></select></div>
+    <div><label class="label">Prioridade</label><select class="field" id="fPriority"><option value="urgente">🔴 Urgente</option><option value="alta">🟠 Alta</option><option value="normal" selected>🟡 Normal</option><option value="baixa">🔵 Baixa</option></select></div>
+    <div><label class="label">Prazo</label><input class="field" id="fDue" type="date"></div>
+    <div><label class="label">Responsável</label><input class="field" id="fOwner" placeholder="Ex.: Goguen"></div>
+    <div class="full"><label class="label">Observações</label><textarea class="field" id="fNotes" rows="4" placeholder="Detalhes, referências, pendências..."></textarea></div>
+   </div></div>
+   <div class="modal-foot"><button type="button" class="btn" onclick="closeModal()">Cancelar</button><button class="btn primary" type="submit">Salvar trabalho</button></div>
+  </form>
+ </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY='eletropel_marketing_kanban_v4';
+const columns=[{id:'backlog',title:'📥 BACKLOG'},{id:'todo',title:'📌 A FAZER'},{id:'doing',title:'🔵 EM ANDAMENTO'},{id:'waiting',title:'⏳ AGUARDANDO'},{id:'done',title:'✅ CONCLUÍDO'}];
+let works=JSON.parse(localStorage.getItem(KEY)||'null')||[];
+let editingId=null;
+const $=id=>document.getElementById(id);
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function today(){return new Date().toISOString().slice(0,10)}
+function save(){localStorage.setItem(KEY,JSON.stringify(works))}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function fmtDate(d){if(!d)return 'Sem prazo';let [y,m,day]=d.split('-');return `${day}/${m}/${y}`}
+function pl(p){return {urgente:'🔴 URGENTE',alta:'🟠 ALTA',normal:'🟡 NORMAL',baixa:'🔵 BAIXA'}[p]||p}
+function dc(d,s){if(!d||s==='done')return '';if(d<today())return 'overdue';if(d===today())return 'today';return ''}
+function filtered(){let q=$('search').value.toLowerCase().trim(),p=$('priorityFilter').value,c=$('categoryFilter').value;return works.filter(w=>(!q||[w.title,w.client,w.category,w.owner,w.notes].join(' ').toLowerCase().includes(q))&&(!p||w.priority===p)&&(!c||w.category===c))}
+let draggedId=null;
+
+function render(){
+ let cats=[...new Set(works.map(w=>w.category).filter(Boolean))].sort(),cf=$('categoryFilter'),old=cf.value;
+ cf.innerHTML='<option value="">Todas categorias</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
+ if(cats.includes(old))cf.value=old;
+
+ let f=filtered(),over=works.filter(w=>w.due&&w.due<today()&&w.status!=='done').length;
+ let data=[
+  ['TOTAL',works.length,''],['URGENTES',works.filter(w=>w.priority==='urgente'&&w.status!=='done').length,'red'],
+  ['EM ANDAMENTO',works.filter(w=>w.status==='doing').length,'blue'],['AGUARDANDO',works.filter(w=>w.status==='waiting').length,''],
+  ['ATRASADOS',over,'red'],['CONCLUÍDOS',works.filter(w=>w.status==='done').length,'green']
+ ];
+ $('stats').innerHTML=data.map(x=>`<div class="stat ${x[2]}"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('');
+
+ $('kanban').innerHTML=columns.map(col=>{
+  let arr=f.filter(w=>w.status===col.id);
+  return `<div class="column" data-status="${col.id}">
+   <div class="col-head"><div class="col-title">${col.title}</div><div class="count">${arr.length}</div></div>
+   <div class="cards" data-status="${col.id}">
+    ${arr.length?arr.map(card).join(''):`<div class="empty">Arraste trabalhos para cá</div>`}
+   </div>
+  </div>`;
+ }).join('');
+
+ document.querySelectorAll('.card').forEach(el=>{
+  el.addEventListener('dragstart',e=>{
+   draggedId=el.dataset.id;
+   el.classList.add('dragging');
+   e.dataTransfer.effectAllowed='move';
+   e.dataTransfer.setData('text/plain',draggedId);
+  });
+  el.addEventListener('dragend',()=>{
+   draggedId=null;
+   el.classList.remove('dragging');
+   document.querySelectorAll('.cards').forEach(x=>x.classList.remove('drop-active'));
+  });
+ });
+
+ document.querySelectorAll('.cards').forEach(zone=>{
+  zone.addEventListener('dragover',e=>{
+   e.preventDefault();
+   e.dataTransfer.dropEffect='move';
+   zone.classList.add('drop-active');
+  });
+  zone.addEventListener('dragleave',e=>{
+   if(!zone.contains(e.relatedTarget)) zone.classList.remove('drop-active');
+  });
+  zone.addEventListener('drop',e=>{
+   e.preventDefault(); e.stopPropagation();
+   zone.classList.remove('drop-active');
+   moveWork(draggedId || e.dataTransfer.getData('text/plain'),zone.dataset.status);
+  });
+ });
+}
+
+function moveWork(id,status){
+ const w=works.find(x=>x.id===id);
+ if(!w||!status)return;
+ if(w.status!==status){
+  w.status=status;
+  save();
+  render();
+  const c=columns.find(x=>x.id===status);
+  toast('Trabalho movido para '+(c?c.title.replace(/^\\S+\\s*/,''):'nova etapa')+'.');
+ }
+}
+
+function card(w){
+ return `<article class="card pr-${w.priority}" draggable="true" data-id="${w.id}">
+  <div class="card-top"><h3>${esc(w.title)}</h3><span class="badge p-${w.priority}">${pl(w.priority)}</span></div>
+  ${w.client?`<div class="meta">🏢 ${esc(w.client)}</div>`:''}
+  <div class="meta">🏷️ ${esc(w.category||'Outro')}</div>
+  <div class="meta ${dc(w.due,w.status)}">📅 ${fmtDate(w.due)}</div>
+  ${w.owner?`<div class="meta">👤 ${esc(w.owner)}</div>`:''}
+  ${w.notes?`<div class="meta">📝 ${esc(w.notes).slice(0,90)}${w.notes.length>90?'…':''}</div>`:''}
+  <div class="card-footer">
+   <small class="${dc(w.due,w.status)}">${w.due&&w.status!=='done'&&w.due<today()?'ATRASADO':w.due===today()&&w.status!=='done'?'VENCE HOJE':''}</small>
+   <div>
+    <select class="move-select" title="Mover trabalho" onchange="moveWork('${w.id}',this.value)">
+     <option value="">Mover para...</option>
+     ${columns.filter(c=>c.id!==w.status).map(c=>`<option value="${c.id}">${c.title}</option>`).join('')}
+    </select>
+    <button class="iconbtn" onclick="editWork('${w.id}')" title="Editar">✎</button>
+    <button class="iconbtn" onclick="deleteWork('${w.id}')" title="Excluir">🗑</button>
+   </div>
+  </div>
+ </article>`;
+}
+
+function openModal(id=null){editingId=id;$('modalTitle').textContent=id?'Editar trabalho':'Novo trabalho';if(id){let w=works.find(x=>x.id===id);fTitle.value=w.title;fClient.value=w.client;fCategory.value=w.category;fPriority.value=w.priority;fDue.value=w.due;fOwner.value=w.owner;fNotes.value=w.notes}else{$('workForm').reset();fPriority.value='normal'}$('modalBg').classList.add('open');setTimeout(()=>fTitle.focus(),40)}
+function closeModal(){$('modalBg').classList.remove('open');editingId=null}
+function saveWork(e){e.preventDefault();let d={title:fTitle.value.trim(),client:fClient.value.trim(),category:fCategory.value,priority:fPriority.value,due:fDue.value,owner:fOwner.value.trim(),notes:fNotes.value.trim()};if(editingId)Object.assign(works.find(w=>w.id===editingId),d);else works.push({id:uid(),...d,status:'backlog',created:today()});save();closeModal();render();toast('Trabalho salvo.')}
+function editWork(id){openModal(id)}
+function deleteWork(id){let w=works.find(x=>x.id===id);if(confirm(`Excluir "${w.title}"?`)){works=works.filter(x=>x.id!==id);save();render();toast('Trabalho excluído.')}}
+function clearFilters(){$('search').value='';$('priorityFilter').value='';$('categoryFilter').value='';render()}
+function toast(msg){let t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function exportData(){let b=new Blob([JSON.stringify(works,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='eletropel-marketing-backup.json';a.click();URL.revokeObjectURL(a.href);toast('Backup exportado.')}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw 0;works=d;save();render();toast('Backup restaurado.')}catch{alert('Arquivo JSON inválido.')}};r.readAsText(f);e.target.value=''}
+$('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal()});
+render();
+</script>
+</body>
+</html>

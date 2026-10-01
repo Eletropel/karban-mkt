@@ -36,7 +36,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 .column{background:#e8e9eb;border:1px solid #d4d6d9;border-radius:11px;min-height:410px}
 .col-head{background:#fff;border-radius:11px 11px 0 0;border-bottom:1px solid #d7d9dc;padding:12px 13px;display:flex;justify-content:space-between;align-items:center}
 .col-title{font-size:11px;font-weight:950;letter-spacing:.06em}.count{background:#eee;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:900}
-.cards{padding:9px;min-height:350px}.drop-active{background:#fff3a8}
+.cards{padding:9px;min-height:350px;transition:.12s}.drop-active{background:#fff3a8;box-shadow:inset 0 0 0 2px #f0d800}
 .card{background:var(--card);border:1px solid #d9dce0;border-left:4px solid #aaa;border-radius:8px;padding:12px;margin-bottom:8px;box-shadow:0 4px 12px rgba(0,0,0,.06);transition:.15s}
 .card:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(0,0,0,.1)}.card.dragging{opacity:.45}
 .card.pr-urgente{border-left-color:var(--red)}.card.pr-alta{border-left-color:#ed7c16}.card.pr-normal{border-left-color:#d8b500}.card.pr-baixa{border-left-color:var(--blue)}
@@ -100,7 +100,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 </div>
 <div class="toast" id="toast"></div>
 <script>
-const KEY='eletropel_marketing_kanban_v2';
+const KEY='eletropel_marketing_kanban_v3';
 const columns=[{id:'backlog',title:'📥 BACKLOG'},{id:'todo',title:'📌 A FAZER'},{id:'doing',title:'🔵 EM ANDAMENTO'},{id:'waiting',title:'⏳ AGUARDANDO'},{id:'done',title:'✅ CONCLUÍDO'}];
 let works=JSON.parse(localStorage.getItem(KEY)||'null')||[];
 let editingId=null;
@@ -113,18 +113,82 @@ function fmtDate(d){if(!d)return 'Sem prazo';let [y,m,day]=d.split('-');return `
 function pl(p){return {urgente:'🔴 URGENTE',alta:'🟠 ALTA',normal:'🟡 NORMAL',baixa:'🔵 BAIXA'}[p]||p}
 function dc(d,s){if(!d||s==='done')return '';if(d<today())return 'overdue';if(d===today())return 'today';return ''}
 function filtered(){let q=$('search').value.toLowerCase().trim(),p=$('priorityFilter').value,c=$('categoryFilter').value;return works.filter(w=>(!q||[w.title,w.client,w.category,w.owner,w.notes].join(' ').toLowerCase().includes(q))&&(!p||w.priority===p)&&(!c||w.category===c))}
+let draggedId=null;
+
 function render(){
  let cats=[...new Set(works.map(w=>w.category).filter(Boolean))].sort(),cf=$('categoryFilter'),old=cf.value;
- cf.innerHTML='<option value="">Todas categorias</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');if(cats.includes(old))cf.value=old;
+ cf.innerHTML='<option value="">Todas categorias</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
+ if(cats.includes(old))cf.value=old;
+
  let f=filtered(),over=works.filter(w=>w.due&&w.due<today()&&w.status!=='done').length;
- let data=[['TOTAL',works.length,''],['URGENTES',works.filter(w=>w.priority==='urgente'&&w.status!=='done').length,'red'],['EM ANDAMENTO',works.filter(w=>w.status==='doing').length,'blue'],['AGUARDANDO',works.filter(w=>w.status==='waiting').length,''],['ATRASADOS',over,'red'],['CONCLUÍDOS',works.filter(w=>w.status==='done').length,'green']];
+ let data=[
+   ['TOTAL',works.length,''],
+   ['URGENTES',works.filter(w=>w.priority==='urgente'&&w.status!=='done').length,'red'],
+   ['EM ANDAMENTO',works.filter(w=>w.status==='doing').length,'blue'],
+   ['AGUARDANDO',works.filter(w=>w.status==='waiting').length,''],
+   ['ATRASADOS',over,'red'],
+   ['CONCLUÍDOS',works.filter(w=>w.status==='done').length,'green']
+ ];
  $('stats').innerHTML=data.map(x=>`<div class="stat ${x[2]}"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('');
- $('kanban').innerHTML=columns.map(col=>{let arr=f.filter(w=>w.status===col.id);return `<div class="column"><div class="col-head"><div class="col-title">${col.title}</div><div class="count">${arr.length}</div></div><div class="cards" ondragover="allowDrop(event)" ondrop="drop(event,'${col.id}')" ondragleave="this.classList.remove('drop-active')">${arr.length?arr.map(card).join(''):`<div class="empty">Arraste trabalhos para cá</div>`}</div></div>`}).join('');
- document.querySelectorAll('.card').forEach(el=>{el.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',el.dataset.id);el.classList.add('dragging')});el.addEventListener('dragend',()=>el.classList.remove('dragging'))});
+
+ $('kanban').innerHTML=columns.map(col=>{
+   let arr=f.filter(w=>w.status===col.id);
+   return `<div class="column" data-status="${col.id}">
+     <div class="col-head">
+       <div class="col-title">${col.title}</div>
+       <div class="count">${arr.length}</div>
+     </div>
+     <div class="cards" data-status="${col.id}">
+       ${arr.length?arr.map(card).join(''):`<div class="empty">Arraste trabalhos para cá</div>`}
+     </div>
+   </div>`;
+ }).join('');
+
+ document.querySelectorAll('.card').forEach(el=>{
+   el.addEventListener('dragstart',e=>{
+     draggedId=el.dataset.id;
+     el.classList.add('dragging');
+     e.dataTransfer.effectAllowed='move';
+     e.dataTransfer.setData('text/plain',draggedId);
+   });
+   el.addEventListener('dragend',()=>{
+     draggedId=null;
+     el.classList.remove('dragging');
+     document.querySelectorAll('.cards').forEach(x=>x.classList.remove('drop-active'));
+   });
+ });
+
+ document.querySelectorAll('.cards').forEach(zone=>{
+   zone.addEventListener('dragover',e=>{
+     e.preventDefault();
+     e.dataTransfer.dropEffect='move';
+     zone.classList.add('drop-active');
+   });
+   zone.addEventListener('dragleave',e=>{
+     if(!zone.contains(e.relatedTarget)) zone.classList.remove('drop-active');
+   });
+   zone.addEventListener('drop',e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     zone.classList.remove('drop-active');
+
+     const id=draggedId || e.dataTransfer.getData('text/plain');
+     const status=zone.dataset.status;
+     const w=works.find(x=>x.id===id);
+
+     if(!w || !status) return;
+
+     // Só grava se realmente mudou de coluna.
+     if(w.status!==status){
+       w.status=status;
+       save();
+       render();
+       toast('Trabalho movido para '+columns.find(c=>c.id===status).title.replace(/^\\S+\\s*/,'')+'.');
+     }
+   });
+ });
 }
 function card(w){return `<article class="card pr-${w.priority}" draggable="true" data-id="${w.id}"><div class="card-top"><h3>${esc(w.title)}</h3><span class="badge p-${w.priority}">${pl(w.priority)}</span></div>${w.client?`<div class="meta">🏢 ${esc(w.client)}</div>`:''}<div class="meta">🏷️ ${esc(w.category||'Outro')}</div><div class="meta ${dc(w.due,w.status)}">📅 ${fmtDate(w.due)}</div>${w.owner?`<div class="meta">👤 ${esc(w.owner)}</div>`:''}${w.notes?`<div class="meta">📝 ${esc(w.notes).slice(0,90)}${w.notes.length>90?'…':''}</div>`:''}<div class="card-footer"><small class="${dc(w.due,w.status)}">${w.due&&w.status!=='done'&&w.due<today()?'ATRASADO':w.due===today()&&w.status!=='done'?'VENCE HOJE':''}</small><div><button class="iconbtn" onclick="editWork('${w.id}')" title="Editar">✎</button><button class="iconbtn" onclick="deleteWork('${w.id}')" title="Excluir">🗑</button></div></div></article>`}
-function allowDrop(e){e.preventDefault();e.currentTarget.classList.add('drop-active')}
-function drop(e,status){e.preventDefault();e.currentTarget.classList.remove('drop-active');let id=e.dataTransfer.getData('text/plain'),w=works.find(x=>x.id===id);if(w){w.status=status;save();render();toast('Trabalho movido.')}}
 function openModal(id=null){editingId=id;$('modalTitle').textContent=id?'Editar trabalho':'Novo trabalho';if(id){let w=works.find(x=>x.id===id);fTitle.value=w.title;fClient.value=w.client;fCategory.value=w.category;fPriority.value=w.priority;fDue.value=w.due;fOwner.value=w.owner;fNotes.value=w.notes}else{$('workForm').reset();fPriority.value='normal'}$('modalBg').classList.add('open');setTimeout(()=>fTitle.focus(),40)}
 function closeModal(){$('modalBg').classList.remove('open');editingId=null}
 function saveWork(e){e.preventDefault();let d={title:fTitle.value.trim(),client:fClient.value.trim(),category:fCategory.value,priority:fPriority.value,due:fDue.value,owner:fOwner.value.trim(),notes:fNotes.value.trim()};if(editingId)Object.assign(works.find(w=>w.id===editingId),d);else works.push({id:uid(),...d,status:'backlog',created:today()});save();closeModal();render();toast('Trabalho salvo.')}
